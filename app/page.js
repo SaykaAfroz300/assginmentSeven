@@ -1,69 +1,113 @@
-import Image from "next/image";
+"use client";
+
+import { useEffect, useState } from "react";
+import { getProducts } from "@/lib/api";
+import { getBanglaDate } from "@/lib/helpers";
+import ProductCard from "@/components/ProductCard";
+import CardSkeleton from "@/components/CardSkeleton";
 
 export default function Home() {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [date, setDate] = useState("");
+
+  useEffect(() => {
+    setDate(getBanglaDate());
+    getProducts().then((data) => {
+      setProducts(data);
+      setLoading(false);
+    });
+  }, []);
+
+  const risers = products
+    .filter((p) => p.change.dir === "up")
+    .sort((a, b) => b.change.pct - a.change.pct)
+    .slice(0, 6);
+
+  const fallers = products
+    .filter((p) => p.change.dir === "down")
+    .sort((a, b) => b.change.pct - a.change.pct)
+    .slice(0, 6);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.js
-            </code>{" "}
-            file.
+    <div className="max-w-6xl mx-auto px-4 py-6">
+      {/* hero */}
+      <section className="bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 flex flex-col-reverse md:flex-row items-center gap-6">
+        <div className="flex-1">
+          <span className="inline-block bg-green-100 text-brand text-xs sm:text-sm font-medium px-3 py-1 rounded-full min-h-6">
+            {date}
+          </span>
+          <h1 className="text-3xl sm:text-4xl font-bold mt-3">
+            আজকের বাজারের দাম এক নজরে
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-gray-600 mt-3 max-w-lg">
+            চাল, ডাল, তেল, সবজি, মাছ, মাংস, ডিম ও মসলার দাম — বাজারভিত্তিক
+            বিস্তারিত, গড়, সর্বনিম্ন-সর্বাধিক এবং দামের পরিবর্তন এক জায়গায়।
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
           <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="#সব-পণ্য"
+            className="btn bg-brand hover:bg-brand-dark text-white border-0 mt-5"
           >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
+            সব পণ্য দেখুন
           </a>
         </div>
-      </main>
+        <div className="flex-1 flex justify-center">
+          <img
+            src="/hero.jpg"
+            alt="সবজি ও ফলের ঝুড়ি"
+            className="w-64 sm:w-80 md:w-full max-w-sm rounded-xl"
+          />
+        </div>
+      </section>
+
+      {/* risers */}
+      <section className="mt-8">
+        <h2 className="text-xl font-bold mb-4">
+          <span className="text-red-600 text-sm mr-1">▲</span> আজ দাম বেড়েছে
+        </h2>
+        {loading ? (
+          <CardSkeleton count={6} />
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {risers.map((p) => (
+              <ProductCard key={p.id} product={p} />
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* fallers */}
+      <section className="mt-8">
+        <h2 className="text-xl font-bold mb-4">
+          <span className="text-green-700 text-sm mr-1">▼</span> আজ দাম কমেছে
+        </h2>
+        {loading ? (
+          <CardSkeleton count={6} />
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {fallers.map((p) => (
+              <ProductCard key={p.id} product={p} />
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* all products */}
+      <section id="সব-পণ্য" className="mt-8 scroll-mt-4">
+        <h2 className="text-xl font-bold">সব পণ্য</h2>
+        <p className="text-sm text-gray-500 mb-4">
+          সব পণ্যের আজকের দাম ও দামের পরিবর্তন
+        </p>
+        {loading ? (
+          <CardSkeleton count={9} />
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {products.map((p) => (
+              <ProductCard key={p.id} product={p} />
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   );
 }
