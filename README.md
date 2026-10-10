@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 🛒 বাজার দর (BazarDor)
 
-## Getting Started
+বাংলাদেশের নিত্যপ্রয়োজনীয় পণ্যের দাম এক জায়গায় দেখার জন্য একটি Price Tracking ওয়েবসাইট। চাল, ডাল, তেল, সবজি, মাছ, মাংস, ডিম-দুধ ও মসলার আজকের দাম, দাম বাড়া-কমার হার এবং বাজারভিত্তিক বিস্তারিত দাম দেখা যায়।
 
-First, run the development server:
+**Live Link:** _deploy করার পর এখানে দিন_
+
+## 🧰 Technologies Used
+
+- Next.js (App Router) + JavaScript
+- Tailwind CSS + daisyUI
+- BetterAuth (Email/Password, Google, GitHub)
+- MongoDB (BetterAuth database)
+- react-hot-toast
+
+## ✨ Key Features
+
+1. **Live price ticker** – navbar-এর নিচে infinite scrolling দামের স্ট্রিপ (▲/▼ সহ)
+2. **আজ দাম বেড়েছে / কমেছে** – সবচেয়ে বেশি বাড়া ও কমা ৬টি করে পণ্য, সাথে সব পণ্যের responsive grid
+3. **Category page + Sorting** – ক্যাটাগরি অনুযায়ী পণ্য, দাম অনুযায়ী (কম→বেশি / বেশি→কম) সাজানো, loading skeleton ও 404-style empty state
+4. **Protected Product Details** – লগইন ছাড়া ঢোকা যায় না; সর্বনিম্ন, সর্বোচ্চ, গড় দাম ও বাজারভিত্তিক টেবিল
+5. **Authentication** – Sign In / Sign Up, Google ও GitHub login, toast notification
+6. **My Profile + Update** – নাম আপডেট করার সুবিধা (BetterAuth `updateUser`)
+7. **Fully responsive** – mobile, tablet ও desktop সব স্ক্রিনে কাজ করে
+
+## 🚀 Run Locally
 
 ```bash
+npm install
+cp .env.example .env.local   # নিজের মান বসান
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`.env.local`-এ `MONGODB_URI`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, এবং Google/GitHub-এর client id ও secret দিতে হবে।
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+Social login-এর callback URL: `{BETTER_AUTH_URL}/api/auth/callback/google` ও `{BETTER_AUTH_URL}/api/auth/callback/github`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🔗 API
 
-## Learn More
+`https://api.api-store.workers.dev/api/bazardor` (backup: `https://api.abcz.workers.dev/api/bazardor`)
 
-To learn more about Next.js, take a look at the following resources:
+- `/products`, `/products?category=chal`, `/products/1`
+- `/categories`, `/categories/chal`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📂 Folder Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+app/          pages (home, category, product, signin, signup, profile)
+components/   Navbar, Ticker, ProductCard, Footer ...
+lib/          api helpers, auth config, bengali number helpers
+proxy.js      protects /product and /profile routes
+```
